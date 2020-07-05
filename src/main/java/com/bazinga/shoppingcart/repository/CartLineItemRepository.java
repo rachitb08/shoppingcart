@@ -11,4 +11,6 @@ public interface CartLineItemRepository extends CrudRepository<CartLineItem, Lon
     CartLineItem findByUserIdAndProduct(Long userId, Product product);
 
     List<CartLineItem> findAllByUserId(Long userId);
+
+    int deleteByUserIdAndProduct(Long userId, Product product);
 }

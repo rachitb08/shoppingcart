@@ -1,6 +1,7 @@
 package com.bazinga.shoppingcart.controller;
 
 import com.bazinga.shoppingcart.dto.AddProductToCartRequest;
+import com.bazinga.shoppingcart.dto.RemoveProductFromCartRequest;
 import com.bazinga.shoppingcart.response.UpdatedCartResponse;
 import com.bazinga.shoppingcart.service.CartLineItemService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +26,9 @@ public class CartController {
     }
 
     @PostMapping("remove")
-    public UpdatedCartResponse removeCart(@RequestBody AddProductToCartRequest addProductToCartRequest) {
+    public UpdatedCartResponse removeProductFromCart(@RequestBody RemoveProductFromCartRequest removeProductFromCartRequest) {
 
-        return cartLineItemService.updateCart(addProductToCartRequest);
+        return cartLineItemService.removeProductFromCart(removeProductFromCartRequest);
     }
 
 }

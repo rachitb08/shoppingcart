@@ -1,6 +1,5 @@
 package com.bazinga.shoppingcart.service;
 
-import com.bazinga.shoppingcart.dto.AddProductToCartRequest;
 import com.bazinga.shoppingcart.model.Product;
 
 import java.util.List;
@@ -13,5 +12,5 @@ public interface ProductService {
 
     Product save(Product product);
 
-    Product validateProductExistence(AddProductToCartRequest addProductToCartRequest);
+    Product validateProductExistence(Long productId, Long quantity);
 }

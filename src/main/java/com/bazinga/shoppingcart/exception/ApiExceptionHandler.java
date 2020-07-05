@@ -1,6 +1,7 @@
 package com.bazinga.shoppingcart.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,12 +14,12 @@ import java.util.List;
 public class ApiExceptionHandler {
 
     @SuppressWarnings("rawtypes")
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorItem> handle(ResourceNotFoundException e) {
+    @ExceptionHandler(BazingaRuntimeException.class)
+    public ResponseEntity<ErrorItem> handle(BazingaRuntimeException e) {
         ErrorItem error = new ErrorItem();
         error.setMessage(e.getMessage());
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public static class ErrorItem {

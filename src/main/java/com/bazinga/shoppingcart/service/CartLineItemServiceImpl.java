@@ -1,6 +1,8 @@
 package com.bazinga.shoppingcart.service;
 
 import com.bazinga.shoppingcart.dto.AddProductToCartRequest;
+import com.bazinga.shoppingcart.dto.RemoveProductFromCartRequest;
+import com.bazinga.shoppingcart.exception.BazingaRuntimeException;
 import com.bazinga.shoppingcart.model.CartLineItem;
 import com.bazinga.shoppingcart.model.Product;
 import com.bazinga.shoppingcart.repository.CartLineItemRepository;
@@ -28,11 +30,11 @@ public class CartLineItemServiceImpl implements CartLineItemService {
         UpdatedCartResponse updatedCartResponse = null;
         try {
 
-            Product product = productService.validateProductExistence(addProductToCartRequest);
+            Product product = productService.validateProductExistence(addProductToCartRequest.getProductId(), addProductToCartRequest.getQuantity());
 
-            createOrUpdateCart(addProductToCartRequest, product);
+            createOrUpdateCart(addProductToCartRequest.getUserId(), addProductToCartRequest.getQuantity(), product);
 
-            return fetchCartForUser(addProductToCartRequest);
+            return fetchCartForUser(addProductToCartRequest.getUserId());
         } catch (Exception e) {
 
             updatedCartResponse = new UpdatedCartResponse();
@@ -42,9 +44,36 @@ public class CartLineItemServiceImpl implements CartLineItemService {
         return updatedCartResponse;
     }
 
-    private UpdatedCartResponse fetchCartForUser(AddProductToCartRequest addProductToCartRequest) {
+    @Override
+    public UpdatedCartResponse removeProductFromCart(RemoveProductFromCartRequest removeProductFromCartRequest) {
+        UpdatedCartResponse updatedCartResponse = null;
+        try {
+
+            Product product = productService.validateProductExistence(removeProductFromCartRequest.getProductToRemove(), null);
+
+            removeProductFromCart(removeProductFromCartRequest.getUserId(), product);
+
+            return fetchCartForUser(removeProductFromCartRequest.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            updatedCartResponse = new UpdatedCartResponse();
+            updatedCartResponse.setException(false);
+            updatedCartResponse.setMessage(e.getMessage());
+        }
+        return updatedCartResponse;
+    }
+
+    public void removeProductFromCart(Long userId, Product product) {
+
+        int cartLineItemDeleted = cartLineItemRepository.deleteByUserIdAndProduct(userId, product);
+        if (cartLineItemDeleted == 0) {
+            throw new BazingaRuntimeException("Product cannot be removed from the cart.");
+        }
+    }
+
+    private UpdatedCartResponse fetchCartForUser(Long userId) {
         UpdatedCartResponse updatedCartResponse = new UpdatedCartResponse();
-        List<CartLineItem> cartLineItems = cartLineItemRepository.findAllByUserId(addProductToCartRequest.getUserId());
+        List<CartLineItem> cartLineItems = cartLineItemRepository.findAllByUserId(userId);
         if (CollectionUtils.isNotEmpty(cartLineItems)) {
             updatedCartResponse.setCartLineItems(cartLineItems);
             updatedCartResponse.setTotalQuantity(cartLineItems.size());
@@ -62,18 +91,17 @@ public class CartLineItemServiceImpl implements CartLineItemService {
         return updatedCartResponse;
     }
 
-    public void createOrUpdateCart(AddProductToCartRequest addProductToCartRequest, Product product) {
+    public void createOrUpdateCart(Long userId, Long quantity, Product product) {
 
-        CartLineItem cartLineItem = cartLineItemRepository.findByUserIdAndProduct(addProductToCartRequest.getUserId(),
-                product);
+        CartLineItem cartLineItem = cartLineItemRepository.findByUserIdAndProduct(userId, product);
 
         if (cartLineItem == null) {
             cartLineItem = new CartLineItem();
             cartLineItem.setProduct(product);
-            cartLineItem.setUserId(addProductToCartRequest.getUserId());
+            cartLineItem.setUserId(userId);
         }
 
-        cartLineItem.setQuantity(addProductToCartRequest.getQuantity());
+        cartLineItem.setQuantity(quantity);
         cartLineItemRepository.save(cartLineItem);
     }
 }

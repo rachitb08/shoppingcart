@@ -1,8 +1,6 @@
 package com.bazinga.shoppingcart.service;
 
-import com.bazinga.shoppingcart.dto.AddProductToCartRequest;
-import com.bazinga.shoppingcart.exception.InventoryNotAvailableException;
-import com.bazinga.shoppingcart.exception.ResourceNotFoundException;
+import com.bazinga.shoppingcart.exception.BazingaRuntimeException;
 import com.bazinga.shoppingcart.model.Product;
 import com.bazinga.shoppingcart.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        return productRepository.findById(id).orElseThrow(() -> new BazingaRuntimeException("Product not found"));
     }
 
     @Override
@@ -36,15 +34,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product validateProductExistence(AddProductToCartRequest addProductToCartRequest) {
+    public Product validateProductExistence(Long productId, Long quantity) {
         Product product = null;
-        if (addProductToCartRequest.getProductId() != null  && addProductToCartRequest.getQuantity() != null) {
-            product = getProduct(addProductToCartRequest.getProductId());
+        if (productId != null) {
+            product = getProduct(productId);
             if (product == null) {
-                throw new ResourceNotFoundException("Product Not Found");
+                throw new BazingaRuntimeException("Product Not Found");
             }
-            if (product.getInventory() - addProductToCartRequest.getQuantity() < 0) {
-                throw new InventoryNotAvailableException("Requested quantity not available");
+            if (quantity != null && (product.getInventory() - quantity < 0)) {
+                throw new BazingaRuntimeException("Requested quantity not available");
             }
         }
         return product;
