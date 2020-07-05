@@ -1,5 +1,7 @@
 package com.bazinga.shoppingcart.service;
 
+import com.bazinga.shoppingcart.dto.AddProductToCartRequest;
+import com.bazinga.shoppingcart.exception.InventoryNotAvailableException;
 import com.bazinga.shoppingcart.exception.ResourceNotFoundException;
 import com.bazinga.shoppingcart.model.Product;
 import com.bazinga.shoppingcart.repository.ProductRepository;
@@ -31,5 +33,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product save(Product product) {
         return productRepository.save(product);
+    }
+
+    @Override
+    public Product validateProductExistence(AddProductToCartRequest addProductToCartRequest) {
+        Product product = null;
+        if (addProductToCartRequest.getProductId() != null  && addProductToCartRequest.getQuantity() != null) {
+            product = getProduct(addProductToCartRequest.getProductId());
+            if (product == null) {
+                throw new ResourceNotFoundException("Product Not Found");
+            }
+            if (product.getInventory() - addProductToCartRequest.getQuantity() < 0) {
+                throw new InventoryNotAvailableException("Requested quantity not available");
+            }
+        }
+        return product;
     }
 }
