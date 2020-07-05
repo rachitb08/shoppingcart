@@ -18,6 +18,10 @@ public class ProductController {
         this.productService = productService;
     }
 
+    /**
+     * @apiNote This api will retrieve list of products.
+     * @return List of Products
+     */
     @GetMapping(value = { "", "/" })
     public List<Product> getProducts() {
         return productService.getAllProduct();

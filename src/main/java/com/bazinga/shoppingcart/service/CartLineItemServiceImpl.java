@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 public class CartLineItemServiceImpl implements CartLineItemService {
 
     private ProductService productService;
@@ -27,6 +26,7 @@ public class CartLineItemServiceImpl implements CartLineItemService {
     }
 
     @Override
+    @Transactional
     public UpdatedCartResponse updateCart(AddProductToCartRequest addProductToCartRequest) {
         UpdatedCartResponse updatedCartResponse = null;
         try {
@@ -47,6 +47,7 @@ public class CartLineItemServiceImpl implements CartLineItemService {
     }
 
     @Override
+    @Transactional
     public UpdatedCartResponse removeProductFromCart(RemoveProductFromCartRequest removeProductFromCartRequest) {
         UpdatedCartResponse updatedCartResponse = null;
         try {

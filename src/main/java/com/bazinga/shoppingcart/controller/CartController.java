@@ -19,12 +19,25 @@ public class CartController {
         this.cartLineItemService = cartLineItemService;
     }
 
+    /**
+     *
+     * @param addProductToCartRequest
+     * @return UpdatedCartResponse
+     * @apiNote This api will be called when we have added a product into the cart or we are updating(increasing/decreasing)
+     *          the quantity of a product.
+     */
     @PostMapping("add")
     public UpdatedCartResponse addProductToCart(@RequestBody AddProductToCartRequest addProductToCartRequest) {
 
         return cartLineItemService.updateCart(addProductToCartRequest);
     }
 
+    /**
+     *
+     * @param removeProductFromCartRequest
+     * @return UpdatedCartResponse
+     * @apiNote This api will remove any particular product from the cart.
+     */
     @PostMapping("remove")
     public UpdatedCartResponse removeProductFromCart(@RequestBody RemoveProductFromCartRequest removeProductFromCartRequest) {
 
