@@ -1,5 +1,6 @@
 package com.bazinga.shoppingcart.service;
 
+import com.bazinga.shoppingcart.constants.EnumMessage;
 import com.bazinga.shoppingcart.exception.BazingaRuntimeException;
 import com.bazinga.shoppingcart.model.Product;
 import com.bazinga.shoppingcart.repository.ProductRepository;
@@ -25,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new BazingaRuntimeException("Product not found"));
+        return productRepository.findById(id).orElseThrow(() -> new BazingaRuntimeException(EnumMessage.PRODUCT_NOT_FOUND.getErrorMsg()));
     }
 
     @Override
@@ -38,11 +39,8 @@ public class ProductServiceImpl implements ProductService {
         Product product = null;
         if (productId != null) {
             product = getProduct(productId);
-            if (product == null) {
-                throw new BazingaRuntimeException("Product Not Found");
-            }
             if (quantity != null && (product.getInventory() - quantity < 0)) {
-                throw new BazingaRuntimeException("Requested quantity not available");
+                throw new BazingaRuntimeException(EnumMessage.REQUEST_QUANTITY_UNAVAILABLE.getErrorMsg());
             }
         }
         return product;

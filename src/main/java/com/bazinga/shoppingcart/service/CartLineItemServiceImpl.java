@@ -1,5 +1,6 @@
 package com.bazinga.shoppingcart.service;
 
+import com.bazinga.shoppingcart.constants.EnumMessage;
 import com.bazinga.shoppingcart.dto.AddProductToCartRequest;
 import com.bazinga.shoppingcart.dto.RemoveProductFromCartRequest;
 import com.bazinga.shoppingcart.exception.BazingaRuntimeException;
@@ -34,7 +35,8 @@ public class CartLineItemServiceImpl implements CartLineItemService {
 
             createOrUpdateCart(addProductToCartRequest.getUserId(), addProductToCartRequest.getQuantity(), product);
 
-            return fetchCartForUser(addProductToCartRequest.getUserId());
+            updatedCartResponse = fetchCartForUser(addProductToCartRequest.getUserId());
+            updatedCartResponse.setMessage(EnumMessage.CART_UPDATED.getErrorMsg());
         } catch (Exception e) {
 
             updatedCartResponse = new UpdatedCartResponse();
@@ -53,7 +55,8 @@ public class CartLineItemServiceImpl implements CartLineItemService {
 
             removeProductFromCart(removeProductFromCartRequest.getUserId(), product);
 
-            return fetchCartForUser(removeProductFromCartRequest.getUserId());
+            updatedCartResponse = fetchCartForUser(removeProductFromCartRequest.getUserId());
+            updatedCartResponse.setMessage(EnumMessage.PRODUCT_REMOVED.getErrorMsg());
         } catch (Exception e) {
             e.printStackTrace();
             updatedCartResponse = new UpdatedCartResponse();
@@ -67,7 +70,7 @@ public class CartLineItemServiceImpl implements CartLineItemService {
 
         int cartLineItemDeleted = cartLineItemRepository.deleteByUserIdAndProduct(userId, product);
         if (cartLineItemDeleted == 0) {
-            throw new BazingaRuntimeException("Product cannot be removed from the cart.");
+            throw new BazingaRuntimeException(EnumMessage.UNABLE_TO_REMOVE_PRODUCT.getErrorMsg());
         }
     }
 
@@ -83,10 +86,6 @@ public class CartLineItemServiceImpl implements CartLineItemService {
             }
             updatedCartResponse.setTotalCartValue(totalCartValue);
             updatedCartResponse.setException(false);
-            updatedCartResponse.setMessage("Cart updated succcessfully!");
-        } else {
-            updatedCartResponse.setException(true);
-            updatedCartResponse.setMessage("Cart is Empty");
         }
         return updatedCartResponse;
     }
