@@ -31,6 +31,14 @@ public class CartLineItemServiceImpl implements CartLineItemService {
         UpdatedCartResponse updatedCartResponse = null;
         try {
 
+            if (addProductToCartRequest == null ||  addProductToCartRequest.getUserId() == null
+                    || addProductToCartRequest.getProductId() == null) {
+                updatedCartResponse = new UpdatedCartResponse();
+                updatedCartResponse.setException(true);
+                updatedCartResponse.setMessage(EnumMessage.MANDATORY_PARAMS_MISSING.getErrorMsg());
+                return updatedCartResponse;
+            }
+
             Product product = productService.validateProductExistence(addProductToCartRequest.getProductId(), addProductToCartRequest.getQuantity());
 
             createOrUpdateCart(addProductToCartRequest.getUserId(), addProductToCartRequest.getQuantity(), product);
@@ -51,6 +59,14 @@ public class CartLineItemServiceImpl implements CartLineItemService {
     public UpdatedCartResponse removeProductFromCart(RemoveProductFromCartRequest removeProductFromCartRequest) {
         UpdatedCartResponse updatedCartResponse = null;
         try {
+
+            if (removeProductFromCartRequest == null ||  removeProductFromCartRequest.getUserId() == null
+                    || removeProductFromCartRequest.getProductToRemove() == null) {
+                updatedCartResponse = new UpdatedCartResponse();
+                updatedCartResponse.setException(true);
+                updatedCartResponse.setMessage(EnumMessage.MANDATORY_PARAMS_MISSING.getErrorMsg());
+                return updatedCartResponse;
+            }
 
             Product product = productService.validateProductExistence(removeProductFromCartRequest.getProductToRemove(), null);
 
@@ -75,7 +91,8 @@ public class CartLineItemServiceImpl implements CartLineItemService {
         }
     }
 
-    private UpdatedCartResponse fetchCartForUser(Long userId) {
+    @Override
+    public UpdatedCartResponse fetchCartForUser(Long userId) {
         UpdatedCartResponse updatedCartResponse = new UpdatedCartResponse();
         List<CartLineItem> cartLineItems = cartLineItemRepository.findAllByUserId(userId);
         if (CollectionUtils.isNotEmpty(cartLineItems)) {

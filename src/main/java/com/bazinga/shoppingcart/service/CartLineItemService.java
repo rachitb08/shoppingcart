@@ -9,4 +9,6 @@ public interface CartLineItemService {
     UpdatedCartResponse updateCart(AddProductToCartRequest addProductToCartRequest);
 
     UpdatedCartResponse removeProductFromCart(RemoveProductFromCartRequest removeProductFromCartRequest);
+
+    UpdatedCartResponse fetchCartForUser(Long userId);
 }
